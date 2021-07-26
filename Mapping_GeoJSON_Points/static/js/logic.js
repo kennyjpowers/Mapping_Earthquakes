@@ -2,7 +2,7 @@
 console.log("working");
 
 // Create the map object with center and zoom level.
-let map = L.map('mapid').setView([30, 30], 2);
+//let map = L.map('mapid').setView([30, 30], 2);
 
 // Add GeoJSON data.
 let sanFranAirport =
@@ -53,6 +53,22 @@ let dark = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{
     maxZoom: 18,
     accessToken: API_KEY
 });
+
+// Create a base layer that holds both maps.
+let baseMaps = {
+    Street: streets,
+    Dark: dark
+};
+
+// Create the map object with center, zoom level and default layer.
+let map = L.map('mapid', {
+    center: [30, 30],
+    zoom: 2,
+    layers: [streets]
+});
+
+// Pass our map layers into our layers control and add the layers control to the map.
+L.control.layers(baseMaps).addTo(map);
 
 // Then we add our 'graymap' tile layer to the map.
 streets.addTo(map);
