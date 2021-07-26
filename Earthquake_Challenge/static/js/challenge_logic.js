@@ -31,11 +31,13 @@ let baseMaps = {
 // 1. Add a 2nd layer group for the tectonic plate data.
 let allEarthquakes = new L.LayerGroup();
 let plates = new L.LayerGroup();
+let majorEarthquakes = new L.LayerGroup();
 
 
 // 2. Add a reference to the tectonic plates group to the overlays object.
 let overlays = {
-    "Earthquakes": allEarthquakes,
+    "All Earthquakes": allEarthquakes,
+    "Major Earthquakes": majorEarthquakes,
     "Tectonic Plates": plates
 };
 
@@ -64,22 +66,13 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
 
   // This function determines the color of the marker based on the magnitude of the earthquake.
   function getColor(magnitude) {
-    if (magnitude > 5) {
-      return "#ea2c2c";
-    }
-    if (magnitude > 4) {
-      return "#ea822c";
-    }
-    if (magnitude > 3) {
-      return "#ee9c00";
-    }
-    if (magnitude > 2) {
-      return "#eecc00";
-    }
-    if (magnitude > 1) {
+      if (magnitude > 6) {
+	  return "#ea2c2c";
+      }
+      if (magnitude > 5) {
+	  return "#ea822c";
+      }
       return "#d4ee00";
-    }
-      return "#98ee00";
   }
 
     // This function determines the radius of the earthquake marker based on its magnitude.
@@ -119,12 +112,9 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
     legend.onAdd = function() {
 	let div = L.DomUtil.create("div", "info legend");
 
-	const magnitudes = [0, 1, 2, 3, 4, 5];
+	const magnitudes = [0, 5, 6];
 	const colors = [
-	    "#98ee00",
 	    "#d4ee00",
-	    "#eecc00",
-	    "#ee9c00",
 	    "#ea822c",
 	    "#ea2c2c"
 	];
@@ -151,6 +141,20 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
 	    weight: 5
 	}).addTo(plates);
 	plates.addTo(map);
-	    
+	
+    });
+
+    d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson").then(function(majorData) {
+	L.geoJSON(majorData, {
+	    style: styleInfo,
+	    pointToLayer: function(feature, latlng) {
+      		console.log(data);
+      		return L.circleMarker(latlng);
+            },
+	    onEachFeature: function(feature, layer) {
+		layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
+	    }
+	}).addTo(majorEarthquakes);
+	majorEarthquakes.addTo(map);
     });
 });
